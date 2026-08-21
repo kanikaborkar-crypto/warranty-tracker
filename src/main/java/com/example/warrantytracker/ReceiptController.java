@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -84,7 +86,7 @@ public class ReceiptController {
     }
 
     // 5. Delete Receipt
-    @GetMapping("/deleteReceipt/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteReceipt(@PathVariable(value = "id") Long id) {
         receiptRepository.deleteById(id);
         return "redirect:/";
@@ -110,6 +112,8 @@ public class ReceiptController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+
 
     // Helper method to save file locally
     private void handleFileUpload(Receipt receipt, MultipartFile file) {
