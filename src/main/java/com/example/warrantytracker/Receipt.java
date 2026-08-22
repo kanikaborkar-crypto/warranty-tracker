@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.temporal.ChronoUnit;
 
+
 @Entity
 @Table(name = "receipts")
 public class Receipt {
@@ -110,5 +111,19 @@ public class Receipt {
         } else {
             return "ACTIVE";
         }
+    }
+
+
+// Inside the Receipt class:
+
+
+    public int getProgressPercentage() {
+        if (purchaseDate == null || expiryDate == null) return 0;
+        long totalDays = ChronoUnit.DAYS.between(purchaseDate, expiryDate);
+        if (totalDays <= 0) return 100;
+        long elapsed = ChronoUnit.DAYS.between(purchaseDate, LocalDate.now());
+        if (elapsed < 0) return 0;
+        if (elapsed >= totalDays) return 100;
+        return (int) ((elapsed * 100) / totalDays);
     }
 }
