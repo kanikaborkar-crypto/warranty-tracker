@@ -1,63 +1,67 @@
-# Warranty Tracker
+#  Warranty Tracker — Full-Stack Cloud Application
 
-A lightweight Spring Boot application designed to centralize consumer purchase records, manage warranty lifecycles, and automate expiration alerts via background cron workers.
+A full-stack web application designed to track product warranties, manage receipt scans, and send automated expiration reminder emails before coverage lapses.
 
----
-
-## Core Capabilities
-
-* **Automated Expiry Alerts:** Implements Spring Scheduling (`@Scheduled`) to execute daily cron tasks querying records reaching maturity within a 7-day window, triggering notifications via `JavaMailSender`.
-* **Multipart Storage Engine:** Handles multi-format receipt uploads (`.png`, `.jpg`, `.webp`) with custom disk-persistence mapping and inline image serving endpoints.
-* **Dynamic Search & Filtration:** Custom JPA queries handling real-time keyword lookups across product names, categories, and warranty states (Active, Expiring Soon, Expired).
-* **Database Versioning:** Integrated PostgreSQL with Flyway database migration scripts ensuring repeatable schema versioning across deployment environments.
-* **Dashboard UI:** Server-rendered interface built with Thymeleaf and responsive CSS layouts.
+ **Live Deployment:** [https://warranty-tracker-wptf.onrender.com](https://warranty-tracker-wptf.onrender.com)
 
 ---
 
-## Tech Stack
+##  Key Features
 
-| Layer | Technologies |
+* **Receipt & Warranty Management:** Full CRUD operations to track products, purchase dates, warranty duration, and categories.
+* **Receipt Image Uploads:** Multipart file handling with dynamic modal lightbox preview.
+* **Automated Email Alerts:** Background daemon utilizing Spring `@Scheduled` cron jobs to dispatch warning notifications 30 days prior to warranty expiration.
+* **Visual Expiry Engine:** Dynamic progress bar showing real-time elapsed warranty duration.
+* **Cloud Database Persistence:** Integrated with a managed cloud PostgreSQL database on Neon.
+* **Containerized Architecture:** Fully dockerized for multi-stage production builds and deployed on Render.
+
+---
+
+## Architecture & Tech Stack
+
+* **Backend:** Java 17+, Spring Boot 3 (Spring MVC, Spring Data JPA, Spring Mail, Spring Scheduling)
+* **Frontend:** Thymeleaf, Tailwind CSS, JavaScript (Vanilla modal interactions)
+* **Database:** PostgreSQL (Neon Cloud) / HikariCP Connection Pooling
+* **Containerization & CI/CD:** Docker (Multi-stage build), Render Cloud Hosting
+
+---
+
+##  Environment Variables Configuration
+
+To run this project locally or in production, configure the following environment variables:
+
+| Variable | Description |
 | :--- | :--- |
-| **Backend** | Java 17, Spring Boot 3, Spring Data JPA, Spring Mail |
-| **Database & Migration** | PostgreSQL, Flyway |
-| **Frontend** | Thymeleaf, HTML5, CSS3 |
-| **Build & Tooling** | Maven |
+| `SPRING_DATASOURCE_URL` | PostgreSQL JDBC connection URL (`jdbc:postgresql://...`) |
+| `SPRING_DATASOURCE_USERNAME` | Database username |
+| `SPRING_DATASOURCE_PASSWORD` | Database password |
+| `MAIL_USERNAME` | Gmail address for automated email sender |
+| `MAIL_PASSWORD` | Gmail 16-character App Password |
+| `ALERT_RECIPIENT` | Target recipient email for expiration warnings |
 
 ---
 
-## Database Schema (PostgreSQL)
+##  Local Setup & Installation
 
-```sql
-CREATE TABLE receipts (
-    id BIGSERIAL PRIMARY KEY,
-    product_name VARCHAR(255) NOT NULL,
-    category VARCHAR(100),
-    purchase_date DATE NOT NULL,
-    warranty_months INT NOT NULL,
-    expiry_date DATE NOT NULL,
-    receipt_img_url VARCHAR(255)
-);
-Local Setup & Configuration1. PrerequisitesJava 17+PostgreSQL 14+Maven2. Configure application.propertiesUpdate src/main/resources/application.properties with your database and mail credentials:Properties# PostgreSQL Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/warranty_db
-spring.datasource.username=postgres
-spring.datasource.password=your_password
+1. **Clone the Repository:**
+   ```bash
+   git clone [https://github.com/kanikaborkar-crypto/warranty-tracker.git](https://github.com/kanikaborkar-crypto/warranty-tracker.git)
+   cd warranty-tracker
+Configure Database & Credentials:
+Set the required properties in src/main/resources/application.properties or define your environment variables.
 
-# Flyway Configuration
-spring.flyway.enabled=true
-spring.flyway.baseline-on-migrate=true
+Build and Run with Maven:
 
-# SMTP Mail Configuration
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=your-email@gmail.com
-spring.mail.password=your-app-password
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
+Bash
 
-# Notification Target
-app.mail.alert-recipient=your-email@gmail.com
-3. Build & RunBash./mvnw clean install
-./mvnw spring-boot:run
-Access the dashboard at http://localhost:8080.EndpointsMethodEndpointDescriptionGET/Loads dashboard with metrics and active recordsPOST/saveReceiptProcesses multipart upload and creates receiptGET/showFormForUpdate/{id}Fetches receipt details for editingGET/delete/{id}Deletes record by ID and redirectsGET/uploads/{filename}Inline image retrieval endpoint for stored receipts
----
 
+./mvnw clean spring-boot:run
+Run with Docker:
+
+Bash
+
+
+docker build -t warranty-tracker .
+docker run -p 8080:8080 warranty-tracker
+Access Application:
+Navigate to http://localhost:8080 in your web browser.
